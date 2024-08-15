@@ -80,4 +80,4 @@ jobs:
     needs: [backend-docker-image, frontend-docker-image]
     steps:
     - name: deploy from images
-      run: echo "${{ secrets.KUBECONFIG_PRODUCTION }}" && kubectl --kubeconfig $1 apply -f ./CICD
+      run: echo "${{ secrets.KUBECONFIG }}" && kubectl --kubeconfig $1 apply -f ./CICD
