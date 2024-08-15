@@ -1,13 +1,15 @@
 name: Go
-
+env:
+  docker_username: bjornestad
+  docker_password: ${{ secrets.GITHUB_TOKEN }}
+  GIT_COMMIT: ${{ github.sha }}
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-
 jobs:
-  build:
+  Build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -28,3 +30,21 @@ jobs:
     - name: Test frontend
       working-directory: ./frontend
       run: go test -v .
+  
+  Docker-image:
+    runs-on: ubuntu-latest
+    needs: [Build]
+    permissions:
+      packages: write
+    steps:
+    - name: Download code
+      uses: actions/download-artifact@v4
+      with:
+        name: code
+        path: .
+    - name: ls
+      run: ls -la ci
+    - name: build docker
+      run: bash ci/build-docker.sh
+    - name: push docker
+      run: bash ci/push-docker.sh
