@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-persvc
+spec:
+  storageClassName: "gp2"
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+
+#---
+#apiVersion: v1
+#kind: PersistentVolume
+#metadata:
+#  name: redis-pv
+#spec:
+#  storageClassName: "gp2"
+#  capacity:
+#    storage: 69Mi
+#  accessModes:
+#    - ReadWriteOnce
+#  persistentVolumeReclaimPolicy: Retain
+#  hostPath:
+#    path: "/mnt/data"
+
