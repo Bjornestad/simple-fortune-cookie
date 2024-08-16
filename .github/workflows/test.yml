@@ -74,11 +74,19 @@ jobs:
       run: bash frontend/ci/build-docker.sh
     - name: push docker
       run: bash frontend/ci/push-docker.sh
-      
+  
+  test-deploy:
+    runs-on: ubuntu-latest
+    needs: [backend-docker-image, frontend-docker-image]
+    steps:
+    - uses: actions/checkout@v4
+    - name: deploy from images
+      run: echo "${{ secrets.KUBECONFIG_TEST }}" > kubeconfig && kubectl --kubeconfig kubeconfig apply -f ./CICD/
+
   DEPLOY:
     runs-on: ubuntu-latest
     needs: [backend-docker-image, frontend-docker-image]
     steps:
     - uses: actions/checkout@v4
     - name: deploy from images
-      run: echo "${{ secrets.KUBECONFIG }}" > kubeconfig && kubectl --kubeconfig kubeconfig apply -f ./CICD/
+      run: echo "${{ secrets.KUBECONFIG_TEST }}" > kubeconfig && kubectl --kubeconfig kubeconfig apply -f ./CICD/
