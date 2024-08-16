@@ -1,11 +1,16 @@
-port=$(echo "${{ secrets.KUBECONFIG_TEST }}" > kubeconfig && kubectl --kubeconfig kubeconfig get service | grep frontend | tr -s ' ' | cut -d ' ' -f 5 | cut -c5-10)
-echo port is $port
-ip=$(echo "${{ secrets.KUBECONFIG_TEST }}" > kubeconfig && kubectl --kubeconfig kubeconfig get nodes -o wide | head -n 2 | awk '{print $7}' | sed -n 2p)
-echo ip is $ip
-if [ $(curl http://$ip$port/healthz) = "healthy" ]; then
+port=$(echo "${{ secrets.KUBECONFIG_TEST }}" > kubeconfig && kubectl --kubeconfig kubeconfig get service frontend -o=jsonpath='{.spec.ports[0].nodePort}')
+
+ip=$(echo "${{ secrets.KUBECONFIG_TEST }}" > kubeconfig && kubectl --kubeconfig kubeconfig get nodes -o=jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}')
+
+url="http://$ip:$port/healthz"
+
+# Check if curl was successful and if the response is "healthy"
+response=$(curl -s $url | tr -d '\n' | tr -d '\r')
+
+if [ $? -eq 0 ] && [ "$response" = "healthy" ]; then
     echo "This is healthy"
     exit 0
 else
     echo "This is not healthy"
-exit 1
+    exit 1
 fi
