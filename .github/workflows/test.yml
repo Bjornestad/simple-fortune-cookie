@@ -89,4 +89,4 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: deploy from images
-      run: echo "${{ secrets.KUBECONFIG_TEST }}" > kubeconfig && kubectl --kubeconfig kubeconfig apply -f ./CICD/
+      run: echo "${{ secrets.KUBECONFIG }}" > kubeconfig && kubectl --kubeconfig kubeconfig apply -f ./CICD/
