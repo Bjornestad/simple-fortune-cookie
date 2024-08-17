@@ -87,6 +87,8 @@ jobs:
   run_test:
     runs-on: ubuntu-latest
     needs: [test-deploy]
+    outputs:
+      test_result: ${{ steps.test.outputs.test }}
     steps:
     - uses: actions/checkout@v4
     - name: run test
@@ -102,12 +104,9 @@ jobs:
         else
             echo "test=not_healthy" >> $GITHUB_OUTPUT
         fi
-    - name: check if test fails
-      if: ${{steps.test.outputs.test}} == "not_healthy"
-      run: |
-        echo "::error::Test deploy health check failed"
+  
   test_check:
-    if: ${{steps.test.outputs.test}} == "not_healthy"
+    if: ${{ needs.run_test.outputs.test_result }} == 'not_healthy'
     runs-on: ubuntu-latest
     needs: [run_test]
     steps:
