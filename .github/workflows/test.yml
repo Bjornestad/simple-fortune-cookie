@@ -98,15 +98,11 @@ jobs:
         response=$(curl -s $url | tr -d '\n' | tr -d '\r')
         if [ $? -eq 0 ] && [ "$response" = "healthy" ]; then
             echo "test=healthy" >> $GITHUB_OUTPUT
+            exit
         else
             echo "test=not_healthy" >> $GITHUB_OUTPUT
+            core.setFailed('website is not healthy')
         fi
-    - name: check if test fails
-      if: ${{steps.test.outputs.test}} == "not_healthy"
-      run: |
-        cat $GITHUB_OUTPUT
-        echo "${{steps.run_tests.outputs.test}}"
-        core.setFailed('website is not healthy')
   
   DEPLOY:
     runs-on: ubuntu-latest
