@@ -103,7 +103,10 @@ jobs:
         fi
     - name: check if test fails
       if: ${{steps.run_tests.outputs.test}} == "not_healthy"
-      run: core.setFailed('website is not healthy')
+      run: |
+        cat $GITHUB_OUTPUT
+        echo "${{steps.run_tests.outputs.test}}"
+        core.setFailed('website is not healthy')
   
   DEPLOY:
     runs-on: ubuntu-latest
