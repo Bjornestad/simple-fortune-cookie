@@ -98,7 +98,6 @@ jobs:
         response=$(curl -s $url | tr -d '\n' | tr -d '\r')
         if [ $? -eq 0 ] && [ "$response" = "healthy" ]; then
             echo "test=healthy" >> $GITHUB_OUTPUT
-            exit
         else
             echo "test=not_healthy" >> $GITHUB_OUTPUT
             core.setFailed('website is not healthy')
