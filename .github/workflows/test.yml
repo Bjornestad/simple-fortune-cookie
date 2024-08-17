@@ -106,7 +106,7 @@ jobs:
         fi
   
   test_check:
-    if: ${{ needs.run_test.outputs.test_result == 'test=healthy'}} 
+    if: ${{ needs.run_test.outputs.test_result == 'healthy'}} 
     runs-on: ubuntu-latest
     needs: [run_test]
     steps:
