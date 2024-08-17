@@ -74,9 +74,48 @@ jobs:
       run: bash frontend/ci/build-docker.sh
     - name: push docker
       run: bash frontend/ci/push-docker.sh
-  DEPLOY:
+  
+  test-deploy:
     runs-on: ubuntu-latest
     needs: [backend-docker-image, frontend-docker-image]
+    steps:
+    - uses: actions/checkout@v4
+    - name: deploy from images
+      run: echo "${{ secrets.KUBECONFIG_TEST }}" > kubeconfig && kubectl --kubeconfig kubeconfig apply -f ./CICD/
+      
+  run_test:
+    runs-on: ubuntu-latest
+    needs: [test-deploy]
+    outputs:
+      test_result: ${{ steps.test.outputs.test }}
+    steps:
+    - uses: actions/checkout@v4
+    - name: run test
+      id: test
+      run: |
+        port=$(echo "${{ secrets.KUBECONFIG_TEST }}" > kubeconfig && kubectl --kubeconfig kubeconfig get service frontend -o=jsonpath='{.spec.ports[0].nodePort}')
+        ip=$(echo "${{ secrets.KUBECONFIG_TEST }}" > kubeconfig && kubectl --kubeconfig kubeconfig get nodes -o=jsonpath='{.items[0].status.addresses[?(@.type=="ExternalIP")].address}')
+        url="http://$ip:$port/healthz"
+        # Check if curl was successful and if the response is "healthy"
+        response=$(curl -s $url | tr -d '\n' | tr -d '\r')
+        if [ $? -eq 0 ] && [ "$response" = "healthy" ]; then
+            echo "test=healthy" > $GITHUB_OUTPUT
+        else
+            echo "test=not_healthy" > $GITHUB_OUTPUT
+        fi
+  
+  test_check:
+    if: ${{ needs.run_test.outputs.test_result == 'healthy'}} 
+    runs-on: ubuntu-latest
+    needs: [run_test]
+    steps:
+    - name: check if test success
+      run: |
+        echo "::notice::Test deploy health check success"
+  
+  DEPLOY:
+    runs-on: ubuntu-latest
+    needs: [test_check]
     steps:
     - uses: actions/checkout@v4
     - name: deploy from images
