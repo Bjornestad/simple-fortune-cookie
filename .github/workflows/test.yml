@@ -101,7 +101,7 @@ jobs:
         response=$(curl -s $url | tr -d '\n' | tr -d '\r')
 
         if [ $? -eq 0 ] && [ "$response" = "healthy" ]; then
-            echo "This is healthy"
+            echo "This is healthy" >> $GITHUB_OUTPUT
             exit 0
         else
             echo "This is not healthy" >> $GITHUB_OUTPUT
