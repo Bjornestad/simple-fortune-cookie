@@ -105,7 +105,9 @@ jobs:
         fi
     - name: check if test fails
       if: ${{steps.run_tests.outputs.test}} == "healthy"
-      run: echo "::error::test deploy health test failed"
+      run: |
+        echo "::error::test deploy health test failed"
+        exit 1
   
   DEPLOY:
     runs-on: ubuntu-latest
