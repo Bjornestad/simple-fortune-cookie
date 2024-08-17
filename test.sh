@@ -1,3 +1,4 @@
+#!/bin/bash
 port=$(echo "${{ secrets.KUBECONFIG_TEST }}" > kubeconfig && kubectl --kubeconfig kubeconfig get service frontend -o=jsonpath='{.spec.ports[0].nodePort}')
 
 ip=$( kubectl --kubeconfig kubeconfig get nodes -o=jsonpath='{.items[0].status.addresses[?(@.type=="ExternalIP")].address}')
@@ -8,9 +9,9 @@ url="http://$ip:$port/healthz"
 response=$(curl -s $url | tr -d '\n' | tr -d '\r')
 
 if [ $? -eq 0 ] && [ "$response" = "healthy" ]; then
-    echo "This is healthy"
+    echo "test=healthy" >> $GITHUB_OUTPUT
     exit 0
 else
-    echo "This is not healthy"
+    echo "test=not_healthy" >> $GITHUB_OUTPUT
     exit 1
 fi
