@@ -102,7 +102,7 @@ jobs:
             echo "test=not_healthy" >> $GITHUB_OUTPUT
         fi
     - name: check if test fails
-      if: ${{steps.run_tests.outputs.test}} == "not_healthy"
+      if: ${{steps.test.outputs.test}} == "not_healthy"
       run: |
         cat $GITHUB_OUTPUT
         echo "${{steps.run_tests.outputs.test}}"
