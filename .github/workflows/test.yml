@@ -106,13 +106,13 @@ jobs:
         fi
   
   test_check:
-    if: ${{ needs.run_test.outputs.test_result == 'not_healthy'}} 
+    if: ${{ needs.run_test.outputs.test_result == 'healthy'}} 
     runs-on: ubuntu-latest
     needs: [run_test]
     steps:
     - name: check if test success
       run: |
-        echo "::error::Test deploy health check fail"
+        echo "::notice::Test deploy health check success"
   
   DEPLOY:
     runs-on: ubuntu-latest
