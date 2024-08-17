@@ -93,6 +93,7 @@ jobs:
       run: |
         port=$(echo "${{ secrets.KUBECONFIG_TEST }}" > kubeconfig && kubectl --kubeconfig kubeconfig get service frontend -o=jsonpath='{.spec.ports[0].nodePort}')
         ip=$(echo "${{ secrets.KUBECONFIG_TEST }}" > kubeconfig && kubectl --kubeconfig kubeconfig get nodes -o=jsonpath='{.items[0].status.addresses[?(@.type=="ExternalIP")].address}')
+        echo "$ip:$port"
         url="http://$ip:$port/healthz"
         # Check if curl was successful and if the response is "healthy"
         response=$(curl -s $url | tr -d '\n' | tr -d '\r')
