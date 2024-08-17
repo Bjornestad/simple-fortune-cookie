@@ -109,6 +109,10 @@ jobs:
     if: ${{ needs.run_test.outputs.test_result == 'test=healthy'}} 
     runs-on: ubuntu-latest
     needs: [run_test]
+    steps:
+    - name: check if test success
+      run: |
+        echo "::notice::Test deploy health check success"
   
   DEPLOY:
     runs-on: ubuntu-latest
