@@ -93,20 +93,17 @@ jobs:
       run: |
         port=$(echo "${{ secrets.KUBECONFIG_TEST }}" > kubeconfig && kubectl --kubeconfig kubeconfig get service frontend -o=jsonpath='{.spec.ports[0].nodePort}')
         ip=$(echo "${{ secrets.KUBECONFIG_TEST }}" > kubeconfig && kubectl --kubeconfig kubeconfig get nodes -o=jsonpath='{.items[0].status.addresses[?(@.type=="ExternalIP")].address}')
-        echo "$ip:$port"
         url="http://$ip:$port/healthz"
         # Check if curl was successful and if the response is "healthy"
         response=$(curl -s $url | tr -d '\n' | tr -d '\r')
         if [ $? -eq 0 ] && [ "$response" = "healthy" ]; then
-            echo "test=healthy" > $GITHUB_OUTPUT
+            echo "test=healthy" >> $GITHUB_OUTPUT
         else
-            echo "test=not_healthy" > $GITHUB_OUTPUT
+            echo "test=not_healthy" >> $GITHUB_OUTPUT
         fi
     - name: check if test fails
       if: ${{steps.run_tests.outputs.test}} == "not_healthy"
-      run: |
-        echo "::error::test deploy health test failed"
-        exit 1
+      run: core.setFailed('website is not healthy')
   
   DEPLOY:
     runs-on: ubuntu-latest
