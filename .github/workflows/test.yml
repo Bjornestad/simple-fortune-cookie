@@ -98,10 +98,10 @@ jobs:
         response=$(curl -s $url | tr -d '\n' | tr -d '\r')
         if [ $? -eq 0 ] && [ "$response" = "healthy" ]; then
             echo "test=healthy" >> $GITHUB_OUTPUT
-            exit 0
+            echo "$GITHUB_OUTPUT"
         else
             echo "test=not_healthy" >> $GITHUB_OUTPUT
-            exit 1
+            echo "$GITHUB_OUTPUT"
         fi
     - name: check if test fails
       if: ${{steps.run_tests.outputs.test}} == "not_healthy"
