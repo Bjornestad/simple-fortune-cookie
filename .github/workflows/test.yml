@@ -88,14 +88,12 @@ jobs:
     needs: [test-deploy]
     steps:
     - uses: actions/checkout@v4
-    - name: Run test
+    - name: run test
       id: test
-      run: |
-        output=$(bash test.sh)
-        echo "test_output=$output" >> $GITHUB_ENV
-    - name: Check if test fails
-      if: ${{ env.test_output == 'This is healthy' }}
-      run: echo "::error::Test deploy health test failed"
+      run: bash test.sh
+    - name: check if test fails
+      if: ${{steps.test.outputs.test}} == "healthy"
+      run: echo "::error::test deploy health test failed"
   
   DEPLOY:
     runs-on: ubuntu-latest
